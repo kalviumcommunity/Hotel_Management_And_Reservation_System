@@ -1,12 +1,14 @@
 #include <iostream>
 #include <cstring>
+#include <cstdlib>
 
 #define max 100
 
 using namespace std;
 
-class Customer {
-public:
+class Customer
+{
+private:
     char name[100];
     char address[100];
     char phone[12];
@@ -15,20 +17,98 @@ public:
     float payment_advance;
     int booking_id;
 
-    Customer() {
-        strcpy(name, "");
-        strcpy(address, "");
-        strcpy(phone, "");
-        strcpy(from_date, "");
-        strcpy(to_date, "");
-        payment_advance = 0.0;
-        booking_id = 0;
+public:
+    const char *getName() const
+    {
+        return name;
+    }
+
+    void setName(const char *newName)
+    {
+        strncpy(name, newName, sizeof(name));
+        name[sizeof(name) - 1] = '\0';
+    }
+
+    const char *getAddress() const
+    {
+        return address;
+    }
+
+    void setAddress(const char *newAddress)
+    {
+        strncpy(address, newAddress, sizeof(address));
+        address[sizeof(address) - 1] = '\0';
+    }
+
+    const char *getPhone() const
+    {
+        return phone;
+    }
+
+    void setPhone(const char *newPhone)
+    {
+        strncpy(phone, newPhone, sizeof(phone));
+        phone[sizeof(phone) - 1] = '\0';
+    }
+
+    const char *getFromDate() const
+    {
+        return from_date;
+    }
+
+    void setFromDate(const char *newFromDate)
+    {
+        strncpy(from_date, newFromDate, sizeof(from_date));
+        from_date[sizeof(from_date) - 1] = '\0';
+    }
+
+    const char *getToDate() const
+    {
+        return to_date;
+    }
+
+    void setToDate(const char *newToDate)
+    {
+        strncpy(to_date, newToDate, sizeof(to_date));
+        to_date[sizeof(to_date) - 1] = '\0';
+    }
+
+    float getPaymentAdvance() const
+    {
+        return payment_advance;
+    }
+
+    void setPaymentAdvance(float newPaymentAdvance)
+    {
+        payment_advance = newPaymentAdvance;
+    }
+
+    int getBookingId() const
+    {
+        return booking_id;
+    }
+
+    void setBookingId(int newBookingId)
+    {
+        booking_id = newBookingId;
+    }
+
+    Customer()
+    {
+        setName("");
+        setAddress("");
+        setPhone("");
+        setFromDate("");
+        setToDate("");
+        setPaymentAdvance(0.0);
+        setBookingId(0);
     }
 };
 
+
 class Room {
 public:
-    static int roomCount; 
+    static int roomCount;
     char type;
     char stype;
     char ac;
@@ -47,11 +127,15 @@ public:
     }
 
     Room(int rno) {
-        this->roomNumber = rno;
-        this->status = 0;
+        roomNumber = rno;
+        status = 0;
     }
 
-    Room addRoom(int);
+    static int getRoomCount() {
+        return roomCount;
+    }
+
+    static Room* addRoom(int rno);
     void searchRoom(int);
     void displayRoom(Room);
     bool isValidDate(const char*);
@@ -61,22 +145,23 @@ public:
 };
 
 Room rooms[max];
-int Room::roomCount = 0; 
+int Room::roomCount = 0;
 
-Room Room::addRoom(int rno) {
-    Room room(rno);
+Room* Room::addRoom(int rno) {
+    Room* room = new Room(rno); 
+
     cout << "\nType AC/Non-AC (A/N): ";
-    cin >> room.ac;
+    cin >> room->ac;
     cout << "\nType Comfort (S/N): ";
-    cin >> room.type;
+    cin >> room->type;
     cout << "\nType Size (B/S): ";
-    cin >> room.stype;
+    cin >> room->stype;
     cout << "\nDaily Rent: ";
-    cin >> room.rent;
+    cin >> room->rent;
 
     cout << "\nRoom Added Successfully!\n\n\n";
     cin.ignore();
-    return room;
+    return room; 
 }
 
 void Room::searchRoom(int rno) {
@@ -90,7 +175,7 @@ void Room::searchRoom(int rno) {
     if (found == 1) {
         cout << "Room Details\n";
         if (rooms[i].status == 1) {
-            cout << "\nRoom is Reserved for " << rooms[i].cust.name << " from " << rooms[i].cust.from_date << " to " << rooms[i].cust.to_date;
+            cout << "\nRoom is Reserved for " << rooms[i].cust.getName() << " from " << rooms[i].cust.getFromDate() << " to " << rooms[i].cust.getToDate();
         } else {
             cout << "\nRoom is available";
         }
@@ -153,32 +238,44 @@ void Room::registerCustomer(int rno) {
     if (found == 1 && rooms[i].status == 0) {
         cout << "\nEnter Customer Name: ";
         cin.ignore();
-        cin.getline(rooms[i].cust.name, sizeof(rooms[i].cust.name));
+        char tempName[100];
+        cin.getline(tempName, sizeof(tempName));
+        rooms[i].cust.setName(tempName);
 
         cout << "\nEnter Customer Address: ";
-        cin.getline(rooms[i].cust.address, sizeof(rooms[i].cust.address));
+        char tempAddress[100];
+        cin.getline(tempAddress, sizeof(tempAddress));
+        rooms[i].cust.setAddress(tempAddress);
 
         cout << "\nEnter Customer Phone: ";
-        cin.getline(rooms[i].cust.phone, sizeof(rooms[i].cust.phone));
+        char tempPhone[12];
+        cin.getline(tempPhone, sizeof(tempPhone));
+        rooms[i].cust.setPhone(tempPhone);
 
         do {
             cout << "\nEnter From Date (dd/mm/yyyy): ";
-            cin >> rooms[i].cust.from_date;
-        } while (!isValidDate(rooms[i].cust.from_date));
+            char tempFromDate[20];
+            cin >> tempFromDate;
+            rooms[i].cust.setFromDate(tempFromDate);
+        } while (!isValidDate(rooms[i].cust.getFromDate()));
 
         do {
             cout << "\nEnter To Date (dd/mm/yyyy): ";
-            cin >> rooms[i].cust.to_date;
-        } while (!isValidDate(rooms[i].cust.to_date) || !isChronologicalDate(rooms[i].cust.from_date, rooms[i].cust.to_date));
+            char tempToDate[20];
+            cin >> tempToDate;
+            rooms[i].cust.setToDate(tempToDate);
+        } while (!isValidDate(rooms[i].cust.getToDate()) || !isChronologicalDate(rooms[i].cust.getFromDate(), rooms[i].cust.getToDate()));
 
         cout << "\nEnter Advance Payment: ";
-        cin >> rooms[i].cust.payment_advance;
+        float paymentAdvance;
+        cin >> paymentAdvance;
+        rooms[i].cust.setPaymentAdvance(paymentAdvance);
 
-        if (rooms[i].cust.payment_advance >= rooms[i].rent) {
+        if (rooms[i].cust.getPaymentAdvance() >= rooms[i].rent) {
             cout << "\nAdvance payment is equal to or greater than the room rent.";
         } else {
             rooms[i].status = 1;
-            rooms[i].cust.booking_id = i + 1;
+            rooms[i].cust.setBookingId(i + 1);
             cout << "\nCustomer Registered Successfully!";
         }
         cin.ignore();
@@ -196,7 +293,7 @@ void Room::displayAllRooms() {
         for (int i = 0; i < Room::roomCount; i++) {
             cout << "Room Number: " << rooms[i].roomNumber << " Status: ";
             if (rooms[i].status == 1) {
-                cout << "Reserved for " << rooms[i].cust.name << " from " << rooms[i].cust.from_date << " to " << rooms[i].cust.to_date;
+                cout << "Reserved for " << rooms[i].cust.getName() << " from " << rooms[i].cust.getFromDate() << " to " << rooms[i].cust.getToDate();
             } else {
                 cout << "Available";
             }
@@ -226,7 +323,7 @@ int main() {
             case '1':
                 cout << "Enter Room Number: ";
                 cin >> rno;
-                rooms[Room::roomCount++] = rooms[Room::roomCount].addRoom(rno);
+                rooms[Room::roomCount++] = *Room::addRoom(rno);
                 break;
             case '2':
                 cout << "Enter Room Number: ";
@@ -243,6 +340,10 @@ int main() {
                 cin.get();
                 break;
             case '5':
+                // Release dynamically allocated memory for each room
+                for (int i = 0; i < Room::roomCount; i++) {
+                    delete &rooms[i];
+                }
                 exit(0);
         }
     } while (ch != '5');
