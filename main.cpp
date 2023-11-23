@@ -6,8 +6,17 @@
 
 using namespace std;
 
-class Customer
-{
+class Accommodation {
+public:
+    virtual void displayRoom() = 0;
+};
+
+class Facility {
+public:
+    virtual void displayFacility() = 0;
+};
+
+class Customer {
 private:
     char name[100];
     char address[100];
@@ -18,83 +27,68 @@ private:
     int booking_id;
 
 public:
-    const char *getName() const
-    {
+    const char* getName() const {
         return name;
     }
 
-    void setName(const char *newName)
-    {
+    void setName(const char* newName) {
         strncpy(name, newName, sizeof(name));
         name[sizeof(name) - 1] = '\0';
     }
 
-    const char *getAddress() const
-    {
+    const char* getAddress() const {
         return address;
     }
 
-    void setAddress(const char *newAddress)
-    {
+    void setAddress(const char* newAddress) {
         strncpy(address, newAddress, sizeof(address));
         address[sizeof(address) - 1] = '\0';
     }
 
-    const char *getPhone() const
-    {
+    const char* getPhone() const {
         return phone;
     }
 
-    void setPhone(const char *newPhone)
-    {
+    void setPhone(const char* newPhone) {
         strncpy(phone, newPhone, sizeof(phone));
         phone[sizeof(phone) - 1] = '\0';
     }
 
-    const char *getFromDate() const
-    {
+    const char* getFromDate() const {
         return from_date;
     }
 
-    void setFromDate(const char *newFromDate)
-    {
+    void setFromDate(const char* newFromDate) {
         strncpy(from_date, newFromDate, sizeof(from_date));
         from_date[sizeof(from_date) - 1] = '\0';
     }
 
-    const char *getToDate() const
-    {
+    const char* getToDate() const {
         return to_date;
     }
 
-    void setToDate(const char *newToDate)
-    {
+    void setToDate(const char* newToDate) {
         strncpy(to_date, newToDate, sizeof(to_date));
         to_date[sizeof(to_date) - 1] = '\0';
     }
 
-    float getPaymentAdvance() const
-    {
+    float getPaymentAdvance() const {
         return payment_advance;
     }
 
-    void setPaymentAdvance(float newPaymentAdvance)
-    {
+    void setPaymentAdvance(float newPaymentAdvance) {
         payment_advance = newPaymentAdvance;
     }
 
-    int getBookingId() const
-    {
+    int getBookingId() const {
         return booking_id;
     }
 
-    void setBookingId(int newBookingId)
-    {
+    void setBookingId(int newBookingId) {
         booking_id = newBookingId;
     }
 
-    Customer()
-    {
+    Customer() {
         setName("");
         setAddress("");
         setPhone("");
@@ -105,8 +99,7 @@ public:
     }
 };
 
-
-class Room {
+class Room : public Accommodation, public Facility {
 public:
     static int roomCount;
     char type;
@@ -135,9 +128,63 @@ public:
         return roomCount;
     }
 
+    virtual void displayRoom() {
+        cout << "\nRoom Number: " << roomNumber;
+        cout << "\nType AC/Non-AC (A/N): " << ac;
+        cout << "\nType Comfort (S/N): " << type;
+        cout << "\nType Size (B/S): " << stype;
+        cout << "\nRent: " << rent;
+    }
+
+    virtual void displayFacility() {
+        cout << "\nAdditional Facilities: ";
+        cout << "\n1. Free Wi-Fi";
+        cout << "\n2. Mini Bar";
+        cout << "\n3. Room Service";
+        cout << "\n4. Spa";
+        cout << "\n5. Gym";
+        cout << "\n6. Back";
+    }
+
+    void viewAdditionalFacilities() {
+        char choice;
+        do {
+            system("cls");
+            displayFacility();
+            cout << "\nEnter your choice (1-6): ";
+            cin >> choice;
+
+            switch (choice) {
+                case '1':
+                    cout << "\nFree Wi-Fi is available.";
+                    break;
+                case '2':
+                    cout << "\nMini Bar is available.";
+                    break;
+                case '3':
+                    cout << "\nRoom Service is available.";
+                    break;
+                case '4':
+                    cout << "\nSpa is available.";
+                    break;
+                case '5':
+                    cout << "\nGym is available.";
+                    break;
+                case '6':
+                    // Back to the main menu
+                    return;
+                default:
+                    cout << "\nInvalid choice. Please try again.";
+            }
+
+            cout << "\nPress Enter to continue...";
+            cin.ignore();
+            cin.get();
+        } while (true);
+    }
+
     static Room* addRoom(int rno);
     void searchRoom(int);
-    void displayRoom(Room);
     bool isValidDate(const char*);
     bool isChronologicalDate(const char*, const char*);
     void registerCustomer(int);
@@ -148,7 +195,7 @@ Room rooms[max];
 int Room::roomCount = 0;
 
 Room* Room::addRoom(int rno) {
-    Room* room = new Room(rno); 
+    Room* room = new Room(rno);
 
     cout << "\nType AC/Non-AC (A/N): ";
     cin >> room->ac;
@@ -161,7 +208,7 @@ Room* Room::addRoom(int rno) {
 
     cout << "\nRoom Added Successfully!\n\n\n";
     cin.ignore();
-    return room; 
+    return room;
 }
 
 void Room::searchRoom(int rno) {
@@ -179,20 +226,12 @@ void Room::searchRoom(int rno) {
         } else {
             cout << "\nRoom is available";
         }
-        displayRoom(rooms[i]);
+        rooms[i].displayRoom();
         cin.get();
     } else {
         cout << "\nRoom not found";
         cin.get();
     }
-}
-
-void Room::displayRoom(Room tempRoom) {
-    cout << "\nRoom Number: " << tempRoom.roomNumber;
-    cout << "\nType AC/Non-AC (A/N): " << tempRoom.ac;
-    cout << "\nType Comfort (S/N): " << tempRoom.type;
-    cout << "\nType Size (B/S): " << tempRoom.stype;
-    cout << "\nRent: " << tempRoom.rent;
 }
 
 bool Room::isValidDate(const char* date) {
@@ -316,7 +355,8 @@ int main() {
         cout << "\n3. Register Customer";
         cout << "\n4. Display All Rooms";
         cout << "\n5. Exit";
-        cout << "\nEnter your choice (1-5): ";
+        cout << "\n6. View Additional Facilities";
+        cout << "\nEnter your choice (1-6): ";
         cin >> ch;
 
         switch (ch) {
@@ -345,6 +385,11 @@ int main() {
                     delete &rooms[i];
                 }
                 exit(0);
+            case '6':
+                rooms[Room::roomCount].viewAdditionalFacilities();
+                break;
+            default:
+                cout << "\nInvalid choice. Please try again.";
         }
     } while (ch != '5');
     return 0;
